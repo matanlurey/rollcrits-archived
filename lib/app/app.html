@@ -1,0 +1,53 @@
+<h2>
+  Attack
+  <div class="action-container">
+    <material-button
+      *ngFor="let dice of AttackDice.values"
+      class="action"
+      icon
+      (trigger)="addAttackDice(dice)"
+    >
+      <rc-attack-dice [color]="dice"></rc-attack-dice>
+    </material-button>
+    <material-button
+      class="action"
+      (trigger)="(clearAttackDice)"
+      style="text-align: center"
+    >
+      Clear
+    </material-button>
+  </div>
+</h2>
+
+<material-button icon (trigger)="(toggleAttackSurge)">
+  <div class="toggle-status">
+    Surge <rc-attack-side [side]="attackSurge"></rc-attack-side>
+  </div>
+</material-button>
+
+<section class="attack-pool">
+  <rc-attack-dice *ngFor="let dice of attackDice" [color]="dice">
+  </rc-attack-dice>
+</section>
+
+<h2>
+  Defense
+</h2>
+
+<material-button icon (trigger)="(toggleDefenseSurge)">
+  <div class="toggle-status">
+    Surge <rc-defense-side [side]="defenseSurge"></rc-defense-side>
+  </div>
+</material-button>
+
+<br />
+
+<material-button icon (trigger)="(toggleDefenseDice)">
+  <div class="toggle-status">
+    Color <rc-defense-dice [color]="defenseDice"></rc-defense-dice>
+  </div>
+</material-button>
+
+<h2>Results</h2>
+
+<!-- TODO: Display Results -->

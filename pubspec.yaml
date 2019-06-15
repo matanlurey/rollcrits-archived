@@ -1,0 +1,20 @@
+name: rollcrits
+
+dependencies:
+  angular:
+  angular_components:
+  swlegion:
+
+dev_dependencies:
+  angular_test:
+  build_runner:
+  build_test:
+  build_web_compilers:
+  pedantic:
+  sass_builder:
+  test:
+  webdev:
+
+dependency_overrides:
+  swlegion:
+    path: ../../hquplink/swlegion

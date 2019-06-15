@@ -1,0 +1,32 @@
+// Even if there are no dice we want to have a location for them.
+.attack-pool {
+  min-height: 20px;
+  padding: 8px;
+
+  > rc-attack-dice {
+    padding: 0px 4px;
+  }
+}
+
+.toggle-status {
+  display: flex;
+  justify-content: space-between;
+  min-width: 70px;
+}
+
+// Align the actions and the header text.
+.action-container {
+  align-items: center;
+  display: flex;
+}
+
+// Action buttons in the sub-headers need to align icons/text.
+.action {
+  height: 40px;
+  line-height: 20px;
+
+  &[icon] {
+    align-items: center;
+    display: flex;
+  }
+}

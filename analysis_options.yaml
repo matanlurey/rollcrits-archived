@@ -1,0 +1,10 @@
+analyzer:
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
+  errors:
+    deprecated_member_use_from_same_package: ignore
+  exclude:
+    - ".dart_tool/**"
+
+include: package:pedantic/analysis_options.yaml
