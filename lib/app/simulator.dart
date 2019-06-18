@@ -10,10 +10,22 @@ class Simulator {
   const Simulator(this._holodeck);
 
   Results simulate(Simulation simulation) {
-    final attack = _holodeck.rollAttacks(
+    var attack = _holodeck.rollAttacks(
       simulation.attack,
       simulation.attackSurge,
     );
+    var aimTokens = simulation.aimTokens;
+
+    while (aimTokens > 0) {
+      attack = _holodeck.rerollAttack(
+        attack,
+        surge: simulation.attackSurge,
+        rerollForCrits: simulation.reRollForCrits ? attack.hits.length : 0,
+        maxDice: 2 + simulation.precise,
+      );
+      aimTokens--;
+    }
+
     final hits = attack.hits.length;
     final crits = attack.crits.length;
     final notCancelled = math.max(0, hits - simulation.coverOrDodgeOrGuardian);
@@ -37,6 +49,12 @@ class Simulation {
   /// What [AttackDice] will be present in the attack pool.
   final List<AttackDice> attack;
 
+  /// How many aim tokens the attacker hase.
+  final int aimTokens;
+
+  /// Precise.
+  final int precise;
+
   /// What the unit or weapon's surge should convert to.
   final AttackSurge attackSurge;
 
@@ -55,7 +73,12 @@ class Simulation {
   /// Whether the defending unit has impervious to pierce.
   final bool impervious;
 
+  /// Whether to re-roll hits as crits.
+  final bool reRollForCrits;
+
   const Simulation({
+    @required this.aimTokens,
+    @required this.precise,
     @required this.attack,
     @required this.attackSurge,
     @required this.pierce,
@@ -63,6 +86,7 @@ class Simulation {
     @required this.defenseSurge,
     @required this.coverOrDodgeOrGuardian,
     @required this.impervious,
+    @required this.reRollForCrits,
   });
 }
 

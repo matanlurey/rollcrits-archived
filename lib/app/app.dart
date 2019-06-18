@@ -59,6 +59,33 @@ class RCApp {
   }
 
   @visibleForTemplate
+  var aimTokens = 0;
+
+  @visibleForTemplate
+  void setAimTokens(int amount) {
+    aimTokens = amount;
+    calculateResults();
+  }
+
+  @visibleForTemplate
+  var precise = 0;
+
+  @visibleForTemplate
+  void setPrecise(int amount) {
+    precise = amount;
+    calculateResults();
+  }
+
+  @visibleForTemplate
+  var reRollForCrits = false;
+
+  @visibleForTemplate
+  void setReRollForCrits(bool value) {
+    reRollForCrits = value;
+    calculateResults();
+  }
+
+  @visibleForTemplate
   void addAttackDice(AttackDice color) {
     attackDice = ([...attackDice, color]..sort()).reversed.toList();
     calculateResults();
@@ -68,7 +95,8 @@ class RCApp {
   void resetAttackDice() {
     attackDice = [];
     attackSurge = AttackDiceSide.surge;
-    pierce = 0;
+    pierce = aimTokens = 0;
+    reRollForCrits = false;
     calculateResults();
   }
 
@@ -205,6 +233,8 @@ class RCApp {
   void calculateResults() {
     final results = List<Results>.filled(_iterations, null);
     final simulation = Simulation(
+      aimTokens: aimTokens,
+      precise: precise,
       attack: attackDice,
       attackSurge: _attackToSurge[attackSurge],
       pierce: pierce,
@@ -212,6 +242,7 @@ class RCApp {
       defenseSurge: defenseSurge == DefenseDiceSide.block,
       coverOrDodgeOrGuardian: cover + dodge + guardian,
       impervious: impervious,
+      reRollForCrits: reRollForCrits,
     );
     final distribution = List<int>.filled(attackDice.length + 1, 0);
 

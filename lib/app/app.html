@@ -28,7 +28,7 @@
 <section class="attack-pool">
   <rc-attack-dice *ngFor="let dice of attackDice" [color]="dice">
   </rc-attack-dice>
-  <br />
+  <br /><br />
   <material-input
     type="number"
     label="Pierce"
@@ -36,6 +36,27 @@
     [ngModel]="pierce"
     (ngModelChange)="setPierce($event)"
   ></material-input>
+  <br />
+  <material-input
+    type="number"
+    label="Aim Tokens"
+    floatingLabel
+    [ngModel]="aimTokens"
+    (ngModelChange)="setAimTokens($event)"
+  ></material-input>
+  <material-input
+    type="number"
+    label="Precise"
+    floatingLabel
+    [ngModel]="precise"
+    (ngModelChange)="setPrecise($event)"
+  ></material-input>
+  <material-checkbox
+    [checked]="reRollForCrits"
+    (checkedChange)="setReRollForCrits($event)"
+  >
+    <label>Re-Roll For Crits</label>
+  </material-checkbox>
 </section>
 
 <h2>
