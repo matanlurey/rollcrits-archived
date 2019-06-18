@@ -19,6 +19,14 @@
   }
 }
 
+.defense-cover {
+  padding: 8px;
+
+  ::ng-deep material-radio {
+    margin-left: 0;
+  }
+}
+
 .toggle-status {
   display: flex;
   justify-content: space-between;

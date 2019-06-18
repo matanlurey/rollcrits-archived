@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:angular/angular.dart';
 import 'package:angular/meta.dart';
 import 'package:angular_components/material_button/material_button.dart';
+import 'package:angular_components/material_radio/material_radio.dart';
+import 'package:angular_components/material_radio/material_radio_group.dart';
 import 'package:rollcrits/widgets.dart';
 import 'package:swlegion/holodeck.dart';
 import 'package:swlegion/swlegion.dart';
@@ -9,6 +13,8 @@ import 'package:swlegion/swlegion.dart';
   selector: 'rc-app',
   directives: [
     MaterialButtonComponent,
+    MaterialRadioComponent,
+    MaterialRadioGroupComponent,
     NgFor,
     NgIf,
     RCAttackDice,
@@ -68,6 +74,16 @@ class RCApp {
   var defenseSurge = DefenseDiceSide.surge;
 
   @visibleForTemplate
+  var cover = 0;
+
+  @visibleForTemplate
+  void setCover(int amount, bool ifTrue) {
+    if (ifTrue) {
+      cover = amount;
+    }
+  }
+
+  @visibleForTemplate
   void toggleDefenseDice() {
     if (defenseDice == DefenseDice.white) {
       defenseDice = DefenseDice.red;
@@ -80,6 +96,7 @@ class RCApp {
   void resetDefenseDice() {
     defenseSurge = DefenseDiceSide.surge;
     defenseDice = DefenseDice.white;
+    cover = 0;
     _resetResults();
   }
 
@@ -105,6 +122,9 @@ class RCApp {
   num averageHits;
 
   @visibleForTemplate
+  num averageCrits;
+
+  @visibleForTemplate
   num averageBlocks;
 
   @visibleForTemplate
@@ -112,11 +132,11 @@ class RCApp {
 
   @visibleForTemplate
   static String formatResults(num result) {
-    return result.toStringAsPrecision(2);
+    return result.toStringAsFixed(2);
   }
 
   void _resetResults() {
-    averageHits = averageBlocks = averageWounds = null;
+    averageHits = averageCrits = averageBlocks = averageWounds = null;
   }
 
   @visibleForTemplate
@@ -125,6 +145,7 @@ class RCApp {
   @visibleForTemplate
   void calculateResults() {
     var sumTotalHits = 0;
+    var sumTotalCrits = 0;
     var sumTotalBlocks = 0;
     var sumTotalWounds = 0;
 
@@ -133,18 +154,24 @@ class RCApp {
         attackDice,
         _attackToSurge[attackSurge],
       );
-      sumTotalHits += attack.totalHits;
 
+      final hits = attack.hits.length;
+      final crits = attack.crits.length;
+      sumTotalHits += hits;
+      sumTotalCrits += crits;
+
+      final success = max<int>(0, hits - cover) + crits;
       final defense = _holodeck.rollDefenses(
         defenseDice,
-        attack.totalHits,
+        success,
         surge: defenseSurge == DefenseDiceSide.block,
       );
       sumTotalBlocks += defense.blocks;
-      sumTotalWounds += (attack.totalHits - defense.blocks);
+      sumTotalWounds += (success - defense.blocks);
     }
 
     averageHits = sumTotalHits / _iterations;
+    averageCrits = sumTotalCrits / _iterations;
     averageBlocks = sumTotalBlocks / _iterations;
     averageWounds = sumTotalWounds / _iterations;
   }

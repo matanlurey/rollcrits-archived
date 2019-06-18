@@ -57,6 +57,24 @@
   </div>
 </material-button>
 
+<br />
+
+<section class="defense-cover">
+  <h3>Cover</h3>
+
+  <material-radio-group>
+    <material-radio [checked]="cover == 0" (checkedChange)="setCover(0, $event)"
+      >None</material-radio
+    >
+    <material-radio [checked]="cover == 1" (checkedChange)="setCover(1, $event)"
+      >Light</material-radio
+    >
+    <material-radio [checked]="cover == 2" (checkedChange)="setCover(2, $event)"
+      >Heavy</material-radio
+    >
+  </material-radio-group>
+</section>
+
 <h2>
   Results
   <div class="action-container">
@@ -84,6 +102,10 @@
         <tr>
           <td>Hits</td>
           <td>{{ formatResults(averageHits) }}</td>
+        </tr>
+        <tr>
+          <td>Crits</td>
+          <td>{{ formatResults(averageCrits) }}</td>
         </tr>
         <tr>
           <td>Blocks</td>
