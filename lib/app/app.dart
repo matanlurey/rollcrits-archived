@@ -53,6 +53,7 @@ class RCApp {
   @visibleForTemplate
   void addAttackDice(AttackDice color) {
     attackDice = ([...attackDice, color]..sort()).reversed.toList();
+    calculateResults();
   }
 
   @visibleForTemplate
@@ -60,7 +61,7 @@ class RCApp {
     attackDice = [];
     attackSurge = AttackDiceSide.surge;
     pierce = 0;
-    _resetResults();
+    calculateResults();
   }
 
   @visibleForTemplate
@@ -76,6 +77,7 @@ class RCApp {
         attackSurge = AttackDiceSide.surge;
         break;
     }
+    calculateResults();
   }
 
   @visibleForTemplate
@@ -91,6 +93,7 @@ class RCApp {
   void setCover(int amount, bool ifTrue) {
     if (ifTrue) {
       cover = amount;
+      calculateResults();
     }
   }
 
@@ -101,6 +104,7 @@ class RCApp {
     } else {
       defenseDice = DefenseDice.white;
     }
+    calculateResults();
   }
 
   @visibleForTemplate
@@ -108,7 +112,7 @@ class RCApp {
     defenseSurge = DefenseDiceSide.surge;
     defenseDice = DefenseDice.white;
     cover = 0;
-    _resetResults();
+    calculateResults();
   }
 
   @visibleForTemplate
@@ -121,6 +125,7 @@ class RCApp {
         defenseSurge = DefenseDiceSide.surge;
         break;
     }
+    calculateResults();
   }
 
   static const _attackToSurge = {
@@ -142,6 +147,9 @@ class RCApp {
   num averageWounds;
 
   @visibleForTemplate
+  num averageSuppression;
+
+  @visibleForTemplate
   BarChartData chartData;
 
   @visibleForTemplate
@@ -154,13 +162,8 @@ class RCApp {
     return result.toStringAsFixed(2);
   }
 
-  void _resetResults() {
-    averageHits = averageCrits = averageBlocks = averageWounds = null;
-    chartData = null;
-  }
-
   @visibleForTemplate
-  bool get resultsCalculated => averageHits != null;
+  bool get resultsCalculated => averageHits != null && attackDice.isNotEmpty;
 
   @visibleForTemplate
   void calculateResults() {
@@ -179,6 +182,7 @@ class RCApp {
     var sumCrits = 0;
     var sumBlocks = 0;
     var sumWounds = 0;
+    var sumSuppression = 0;
 
     for (var i = 0; i < _iterations; i++) {
       final result = results[i] = _simulator.simulate(simulation);
@@ -188,12 +192,17 @@ class RCApp {
       sumCrits += result.crits;
       sumBlocks += result.blocks;
       sumWounds += result.wounds;
+
+      if (result.hits > 0 || result.crits > 0) {
+        sumSuppression++;
+      }
     }
 
     averageHits = sumHits / _iterations;
     averageCrits = sumCrits / _iterations;
     averageBlocks = sumBlocks / _iterations;
     averageWounds = sumWounds / _iterations;
+    averageSuppression = sumSuppression / _iterations;
 
     final data = <BarChartColumnData>[];
     for (var i = 0; i < distribution.length; i++) {

@@ -85,12 +85,8 @@
 <h2>
   Results
   <div class="action-container">
-    <material-button
-      class="action"
-      (trigger)="(calculateResults)"
-      style="text-align: center"
-    >
-      Calculate
+    <material-button disabled class="action" style="text-align: center">
+      Download .CSV
     </material-button>
   </div>
 </h2>
@@ -102,7 +98,7 @@
     <table>
       <thead>
         <tr>
-          <th></th>
+          <th width="150"></th>
           <th></th>
         </tr>
       </thead>
@@ -114,6 +110,10 @@
         <tr>
           <td>Crits</td>
           <td>{{ formatResults(averageCrits) }}</td>
+        </tr>
+        <tr>
+          <td>Suppression</td>
+          <td>{{ formatResults(averageSuppression) }}</td>
         </tr>
         <tr>
           <td>Blocks</td>
