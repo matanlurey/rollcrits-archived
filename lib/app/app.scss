@@ -19,13 +19,13 @@
   }
 }
 
+h3 {
+  display: inline-block;
+  width: 50px;
+}
+
 .defense-cover {
   padding: 8px;
-
-  h3 {
-    display: inline-block;
-    width: 50px;
-  }
 
   ::ng-deep material-radio {
     margin-left: 0;

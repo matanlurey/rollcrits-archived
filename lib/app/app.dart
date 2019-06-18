@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:angular/angular.dart';
 import 'package:angular/meta.dart';
 import 'package:angular_components/material_button/material_button.dart';
@@ -7,13 +5,17 @@ import 'package:angular_components/material_input/material_input.dart';
 import 'package:angular_components/material_input/material_number_accessor.dart';
 import 'package:angular_components/material_radio/material_radio.dart';
 import 'package:angular_components/material_radio/material_radio_group.dart';
+import 'package:angular_modern_charts/angular_modern_charts.dart';
 import 'package:rollcrits/widgets.dart';
 import 'package:swlegion/holodeck.dart';
 import 'package:swlegion/swlegion.dart';
 
+import 'simulator.dart';
+
 @Component(
   selector: 'rc-app',
   directives: [
+    BarChartComponent,
     MaterialButtonComponent,
     MaterialInputComponent,
     MaterialRadioComponent,
@@ -36,8 +38,8 @@ import 'package:swlegion/swlegion.dart';
   ],
 )
 class RCApp {
-  final _holodeck = Holodeck();
-  final _iterations = 20000;
+  static final _simulator = Simulator(Holodeck());
+  static final _iterations = 20000;
 
   @visibleForTemplate
   var attackDice = <AttackDice>[];
@@ -140,12 +142,21 @@ class RCApp {
   num averageWounds;
 
   @visibleForTemplate
+  BarChartData chartData;
+
+  @visibleForTemplate
+  static final chartProps = BarChartProperties()
+    ..xAxis.title.text = 'Wounds'
+    ..yAxis.title.text = 'Results (of $_iterations)';
+
+  @visibleForTemplate
   static String formatResults(num result) {
     return result.toStringAsFixed(2);
   }
 
   void _resetResults() {
     averageHits = averageCrits = averageBlocks = averageWounds = null;
+    chartData = null;
   }
 
   @visibleForTemplate
@@ -153,39 +164,41 @@ class RCApp {
 
   @visibleForTemplate
   void calculateResults() {
-    var sumTotalHits = 0;
-    var sumTotalCrits = 0;
-    var sumTotalBlocks = 0;
-    var sumTotalWounds = 0;
+    final results = List<Results>.filled(_iterations, null);
+    final simulation = Simulation(
+      attack: attackDice,
+      attackSurge: _attackToSurge[attackSurge],
+      pierce: pierce,
+      defense: defenseDice,
+      defenseSurge: defenseSurge == DefenseDiceSide.block,
+      cover: cover,
+    );
+    final distribution = List<int>.filled(attackDice.length + 1, 0);
+
+    var sumHits = 0;
+    var sumCrits = 0;
+    var sumBlocks = 0;
+    var sumWounds = 0;
 
     for (var i = 0; i < _iterations; i++) {
-      final attack = _holodeck.rollAttacks(
-        attackDice,
-        _attackToSurge[attackSurge],
-      );
+      final result = results[i] = _simulator.simulate(simulation);
+      distribution[result.wounds]++;
 
-      final hits = attack.hits.length;
-      final crits = attack.crits.length;
-      sumTotalHits += hits;
-      sumTotalCrits += crits;
-
-      final success = max(0, hits - cover) + crits;
-      final defense = _holodeck.rollDefenses(
-        defenseDice,
-        success,
-        surge: defenseSurge == DefenseDiceSide.block,
-      );
-
-      final blocks = defense.blocks;
-      sumTotalBlocks += blocks;
-
-      final wounds = success - max<int>(0, blocks - pierce);
-      sumTotalWounds += wounds;
+      sumHits += result.hits;
+      sumCrits += result.crits;
+      sumBlocks += result.blocks;
+      sumWounds += result.wounds;
     }
 
-    averageHits = sumTotalHits / _iterations;
-    averageCrits = sumTotalCrits / _iterations;
-    averageBlocks = sumTotalBlocks / _iterations;
-    averageWounds = sumTotalWounds / _iterations;
+    averageHits = sumHits / _iterations;
+    averageCrits = sumCrits / _iterations;
+    averageBlocks = sumBlocks / _iterations;
+    averageWounds = sumWounds / _iterations;
+
+    final data = <BarChartColumnData>[];
+    for (var i = 0; i < distribution.length; i++) {
+      data.add(BarChartColumnData('$i', [distribution[i].toDouble()]));
+    }
+    chartData = BarChartData(['Wounds'], data);
   }
 }

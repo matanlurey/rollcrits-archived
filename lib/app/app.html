@@ -50,17 +50,17 @@
   </div>
 </h2>
 
-<material-button icon (trigger)="(toggleDefenseSurge)">
+<material-button icon (trigger)="(toggleDefenseDice)">
   <div class="toggle-status">
-    Surge <rc-defense-side [side]="defenseSurge"></rc-defense-side>
+    Color <rc-defense-dice [color]="defenseDice"></rc-defense-dice>
   </div>
 </material-button>
 
 <br />
 
-<material-button icon (trigger)="(toggleDefenseDice)">
+<material-button icon (trigger)="(toggleDefenseSurge)">
   <div class="toggle-status">
-    Color <rc-defense-dice [color]="defenseDice"></rc-defense-dice>
+    Surge <rc-defense-side [side]="defenseSurge"></rc-defense-side>
   </div>
 </material-button>
 
@@ -98,6 +98,7 @@
 <!-- TODO: Display Results -->
 <section class="attack-results">
   <ng-container *ngIf="resultsCalculated">
+    <h3>Averages</h3>
     <table>
       <thead>
         <tr>
@@ -124,6 +125,9 @@
         </tr>
       </tbody>
     </table>
+    <br />
+    <h3>Distribution</h3>
+    <barchart [chartData]="chartData" [chartProperties]="chartProps"></barchart>
   </ng-container>
   <ng-container *ngIf="!resultsCalculated">
     Pending
