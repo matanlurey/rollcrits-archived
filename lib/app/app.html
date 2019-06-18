@@ -11,10 +11,10 @@
     </material-button>
     <material-button
       class="action"
-      (trigger)="(clearAttackDice)"
+      (trigger)="(resetAttackDice)"
       style="text-align: center"
     >
-      Clear
+      Reset
     </material-button>
   </div>
 </h2>
@@ -32,6 +32,15 @@
 
 <h2>
   Defense
+  <div class="action-container">
+    <material-button
+      class="action"
+      (trigger)="(resetDefenseDice)"
+      style="text-align: center"
+    >
+      Reset
+    </material-button>
+  </div>
 </h2>
 
 <material-button icon (trigger)="(toggleDefenseSurge)">
@@ -48,6 +57,46 @@
   </div>
 </material-button>
 
-<h2>Results</h2>
+<h2>
+  Results
+  <div class="action-container">
+    <material-button
+      class="action"
+      (trigger)="(calculateResults)"
+      style="text-align: center"
+    >
+      Calculate
+    </material-button>
+  </div>
+</h2>
 
 <!-- TODO: Display Results -->
+<section class="attack-results">
+  <ng-container *ngIf="resultsCalculated">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Hits</td>
+          <td>{{ formatResults(averageHits) }}</td>
+        </tr>
+        <tr>
+          <td>Blocks</td>
+          <td>{{ formatResults(averageBlocks) }}</td>
+        </tr>
+        <tr>
+          <td>Wounds</td>
+          <td>{{ formatResults(averageWounds) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </ng-container>
+  <ng-container *ngIf="!resultsCalculated">
+    Pending
+  </ng-container>
+</section>

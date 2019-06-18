@@ -8,6 +8,17 @@
   }
 }
 
+.attack-results {
+  padding: 8px;
+
+  tr {
+    td:first-child {
+      color: #999;
+      font-weight: bold;
+    }
+  }
+}
+
 .toggle-status {
   display: flex;
   justify-content: space-between;
