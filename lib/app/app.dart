@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:angular/angular.dart';
 import 'package:angular/meta.dart';
 import 'package:angular_components/material_button/material_button.dart';
+import 'package:angular_components/material_input/material_input.dart';
+import 'package:angular_components/material_input/material_number_accessor.dart';
 import 'package:angular_components/material_radio/material_radio.dart';
 import 'package:angular_components/material_radio/material_radio_group.dart';
 import 'package:rollcrits/widgets.dart';
@@ -13,14 +15,17 @@ import 'package:swlegion/swlegion.dart';
   selector: 'rc-app',
   directives: [
     MaterialButtonComponent,
+    MaterialInputComponent,
     MaterialRadioComponent,
     MaterialRadioGroupComponent,
     NgFor,
     NgIf,
+    NgModel,
     RCAttackDice,
     RCAttackSide,
     RCDefenseDice,
     RCDefenseSide,
+    materialNumberInputDirectives,
   ],
   templateUrl: 'app.html',
   exports: [
@@ -32,13 +37,16 @@ import 'package:swlegion/swlegion.dart';
 )
 class RCApp {
   final _holodeck = Holodeck();
-  final _iterations = 10000;
+  final _iterations = 20000;
 
   @visibleForTemplate
   var attackDice = <AttackDice>[];
 
   @visibleForTemplate
   var attackSurge = AttackDiceSide.surge;
+
+  @visibleForTemplate
+  var pierce = 0;
 
   @visibleForTemplate
   void addAttackDice(AttackDice color) {
@@ -49,6 +57,7 @@ class RCApp {
   void resetAttackDice() {
     attackDice = [];
     attackSurge = AttackDiceSide.surge;
+    pierce = 0;
     _resetResults();
   }
 
@@ -160,14 +169,18 @@ class RCApp {
       sumTotalHits += hits;
       sumTotalCrits += crits;
 
-      final success = max<int>(0, hits - cover) + crits;
+      final success = max(0, hits - cover) + crits;
       final defense = _holodeck.rollDefenses(
         defenseDice,
         success,
         surge: defenseSurge == DefenseDiceSide.block,
       );
-      sumTotalBlocks += defense.blocks;
-      sumTotalWounds += (success - defense.blocks);
+
+      final blocks = defense.blocks;
+      sumTotalBlocks += blocks;
+
+      final wounds = success - max<int>(0, blocks - pierce);
+      sumTotalWounds += wounds;
     }
 
     averageHits = sumTotalHits / _iterations;

@@ -28,6 +28,13 @@
 <section class="attack-pool">
   <rc-attack-dice *ngFor="let dice of attackDice" [color]="dice">
   </rc-attack-dice>
+  <br />
+  <material-input
+    type="number"
+    label="Pierce"
+    floatingLabel
+    [(ngModel)]="pierce"
+  ></material-input>
 </section>
 
 <h2>
