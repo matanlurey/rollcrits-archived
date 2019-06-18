@@ -1,3 +1,5 @@
+$labelWidth: 70px;
+
 // Even if there are no dice we want to have a location for them.
 .attack-pool {
   min-height: 20px;
@@ -32,12 +34,23 @@ h3 {
     margin-top: 0;
     text-transform: uppercase;
   }
+
+  ::ng-deep material-checkbox {
+    margin-left: 0;
+    margin-top: 0;
+    text-transform: uppercase;
+  }
+}
+
+label {
+  font-size: 14px;
+  text-transform: uppercase;
 }
 
 .toggle-status {
   display: flex;
   justify-content: space-between;
-  min-width: 70px;
+  min-width: $labelWidth;
 }
 
 // Align the actions and the header text.

@@ -1,6 +1,7 @@
 import 'package:angular/angular.dart';
 import 'package:angular/meta.dart';
 import 'package:angular_components/material_button/material_button.dart';
+import 'package:angular_components/material_checkbox/material_checkbox.dart';
 import 'package:angular_components/material_input/material_input.dart';
 import 'package:angular_components/material_input/material_number_accessor.dart';
 import 'package:angular_components/material_radio/material_radio.dart';
@@ -17,6 +18,7 @@ import 'simulator.dart';
   directives: [
     BarChartComponent,
     MaterialButtonComponent,
+    MaterialCheckboxComponent,
     MaterialInputComponent,
     MaterialRadioComponent,
     MaterialRadioGroupComponent,
@@ -49,6 +51,12 @@ class RCApp {
 
   @visibleForTemplate
   var pierce = 0;
+
+  @visibleForTemplate
+  void setPierce(int amount) {
+    pierce = amount;
+    calculateResults();
+  }
 
   @visibleForTemplate
   void addAttackDice(AttackDice color) {
@@ -98,6 +106,33 @@ class RCApp {
   }
 
   @visibleForTemplate
+  var dodge = 0;
+
+  @visibleForTemplate
+  void setDodge(int amount) {
+    dodge = amount;
+    calculateResults();
+  }
+
+  @visibleForTemplate
+  var guardian = 0;
+
+  @visibleForTemplate
+  void setGuardian(int amount) {
+    guardian = amount;
+    calculateResults();
+  }
+
+  @visibleForTemplate
+  var impervious = false;
+
+  @visibleForTemplate
+  void setImpervious(bool value) {
+    impervious = value;
+    calculateResults();
+  }
+
+  @visibleForTemplate
   void toggleDefenseDice() {
     if (defenseDice == DefenseDice.white) {
       defenseDice = DefenseDice.red;
@@ -112,6 +147,7 @@ class RCApp {
     defenseSurge = DefenseDiceSide.surge;
     defenseDice = DefenseDice.white;
     cover = 0;
+    dodge = 0;
     calculateResults();
   }
 
@@ -174,7 +210,8 @@ class RCApp {
       pierce: pierce,
       defense: defenseDice,
       defenseSurge: defenseSurge == DefenseDiceSide.block,
-      cover: cover,
+      coverOrDodgeOrGuardian: cover + dodge + guardian,
+      impervious: impervious,
     );
     final distribution = List<int>.filled(attackDice.length + 1, 0);
 

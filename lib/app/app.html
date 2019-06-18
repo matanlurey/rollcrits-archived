@@ -33,7 +33,8 @@
     type="number"
     label="Pierce"
     floatingLabel
-    [(ngModel)]="pierce"
+    [ngModel]="pierce"
+    (ngModelChange)="setPierce($event)"
   ></material-input>
 </section>
 
@@ -80,6 +81,35 @@
       >Heavy</material-radio
     >
   </material-radio-group>
+
+  <br />
+
+  <material-input
+    type="number"
+    label="Dodge"
+    floatingLabel
+    [ngModel]="dodge"
+    (ngModelChange)="setDodge($event)"
+  ></material-input>
+
+  &nbsp;&nbsp;
+
+  <material-input
+    type="number"
+    label="Guardian"
+    floatingLabel
+    [ngModel]="guardian"
+    (ngModelChange)="setGuardian($event)"
+  ></material-input>
+
+  <br />
+
+  <material-checkbox
+    [checked]="impervious"
+    (checkedChange)="setImpervious($event)"
+  >
+    <label>Impervious</label>
+  </material-checkbox>
 </section>
 
 <h2>

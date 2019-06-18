@@ -16,10 +16,11 @@ class Simulator {
     );
     final hits = attack.hits.length;
     final crits = attack.crits.length;
-    final success = math.max(0, hits - simulation.cover) + crits;
+    final notCancelled = math.max(0, hits - simulation.coverOrDodgeOrGuardian);
+    final success = notCancelled + crits;
     final defense = _holodeck.rollDefenses(
       simulation.defense,
-      success,
+      success + (simulation.impervious ? simulation.pierce : 0),
       surge: simulation.defenseSurge,
     );
     final blocks = defense.blocks;
@@ -48,8 +49,11 @@ class Simulation {
   /// Whether the defending unit surges to block.
   final bool defenseSurge;
 
-  /// How much static cover is available.
-  final int cover;
+  /// How much static defenses are available.
+  final int coverOrDodgeOrGuardian;
+
+  /// Whether the defending unit has impervious to pierce.
+  final bool impervious;
 
   const Simulation({
     @required this.attack,
@@ -57,7 +61,8 @@ class Simulation {
     @required this.pierce,
     @required this.defense,
     @required this.defenseSurge,
-    @required this.cover,
+    @required this.coverOrDodgeOrGuardian,
+    @required this.impervious,
   });
 }
 
