@@ -31,10 +31,18 @@
   <br /><br />
   <material-input
     type="number"
-    label="Pierce"
+    label="Pierce: X"
     floatingLabel
     [ngModel]="pierce"
     (ngModelChange)="setPierce($event)"
+  ></material-input>
+  &nbsp;&nbsp;
+  <material-input
+    type="number"
+    label="Impact: X"
+    floatingLabel
+    [ngModel]="impact"
+    (ngModelChange)="setImpact($event)"
   ></material-input>
   <br />
   <material-input
@@ -44,13 +52,15 @@
     [ngModel]="aimTokens"
     (ngModelChange)="setAimTokens($event)"
   ></material-input>
+  &nbsp;&nbsp;
   <material-input
     type="number"
-    label="Precise"
+    label="Precise: X"
     floatingLabel
     [ngModel]="precise"
     (ngModelChange)="setPrecise($event)"
   ></material-input>
+  <br />
   <material-checkbox
     [checked]="reRollForCrits"
     (checkedChange)="setReRollForCrits($event)"
@@ -107,7 +117,7 @@
 
   <material-input
     type="number"
-    label="Dodge"
+    label="Dodge Tokens"
     floatingLabel
     [ngModel]="dodge"
     (ngModelChange)="setDodge($event)"
@@ -117,13 +127,22 @@
 
   <material-input
     type="number"
-    label="Guardian"
+    label="Guardian: X"
     floatingLabel
     [ngModel]="guardian"
     (ngModelChange)="setGuardian($event)"
   ></material-input>
 
   <br />
+
+  <material-dropdown-select
+    [buttonText]="armorLabel"
+    [options]="armorValues"
+    [itemRenderer]="renderArmor"
+    (selectionChange)="setArmor($event)"
+  ></material-dropdown-select>
+
+  <br /><br />
 
   <material-checkbox
     [checked]="impervious"

@@ -1,11 +1,13 @@
 import 'package:angular/angular.dart';
 import 'package:angular/meta.dart';
+import 'package:angular_components/laminate/popup/module.dart';
 import 'package:angular_components/material_button/material_button.dart';
 import 'package:angular_components/material_checkbox/material_checkbox.dart';
 import 'package:angular_components/material_input/material_input.dart';
 import 'package:angular_components/material_input/material_number_accessor.dart';
 import 'package:angular_components/material_radio/material_radio.dart';
 import 'package:angular_components/material_radio/material_radio_group.dart';
+import 'package:angular_components/material_select/material_dropdown_select.dart';
 import 'package:angular_modern_charts/angular_modern_charts.dart';
 import 'package:rollcrits/widgets.dart';
 import 'package:swlegion/holodeck.dart';
@@ -19,6 +21,7 @@ import 'simulator.dart';
     BarChartComponent,
     MaterialButtonComponent,
     MaterialCheckboxComponent,
+    MaterialDropdownSelectComponent,
     MaterialInputComponent,
     MaterialRadioComponent,
     MaterialRadioGroupComponent,
@@ -32,6 +35,9 @@ import 'simulator.dart';
     materialNumberInputDirectives,
   ],
   templateUrl: 'app.html',
+  providers: [
+    popupBindings,
+  ],
   exports: [
     AttackDice,
   ],
@@ -55,6 +61,15 @@ class RCApp {
   @visibleForTemplate
   void setPierce(int amount) {
     pierce = amount;
+    calculateResults();
+  }
+
+  @visibleForTemplate
+  var impact = 0;
+
+  @visibleForTemplate
+  void setImpact(int amount) {
+    impact = amount;
     calculateResults();
   }
 
@@ -161,6 +176,32 @@ class RCApp {
   }
 
   @visibleForTemplate
+  var armor = 0;
+
+  @visibleForTemplate
+  void setArmor(int amount) {
+    armor = amount;
+    calculateResults();
+  }
+
+  @visibleForTemplate
+  static const armorValues = [0, 1, 2, 3, 4, 5];
+
+  @visibleForTemplate
+  String get armorLabel => renderArmor(armor);
+
+  @visibleForTemplate
+  static String renderArmor(Object armor) {
+    if (armor == armorValues.first) {
+      return 'No Armor';
+    }
+    if (armor == armorValues.last) {
+      return 'Armor: ∞';
+    }
+    return 'Armor: $armor';
+  }
+
+  @visibleForTemplate
   void toggleDefenseDice() {
     if (defenseDice == DefenseDice.white) {
       defenseDice = DefenseDice.red;
@@ -234,6 +275,8 @@ class RCApp {
     final results = List<Results>.filled(_iterations, null);
     final simulation = Simulation(
       aimTokens: aimTokens,
+      armor: armor,
+      impact: impact,
       precise: precise,
       attack: attackDice,
       attackSurge: _attackToSurge[attackSurge],

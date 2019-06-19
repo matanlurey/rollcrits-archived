@@ -28,7 +28,22 @@ class Simulator {
 
     final hits = attack.hits.length;
     final crits = attack.crits.length;
-    final notCancelled = math.max(0, hits - simulation.coverOrDodgeOrGuardian);
+    var notCancelled = math.max(0, hits - simulation.coverOrDodgeOrGuardian);
+    if (simulation.armor >= 5) {
+      // Unlimited armor: Only impact hits are counted.
+      final impactHits = math.min(notCancelled, simulation.impact);
+      notCancelled = impactHits;
+    } else if (simulation.armor > 0) {
+      // Limited armor: First, impact hits are counted.
+      final impactHits = math.min(notCancelled, simulation.impact);
+      final nonImpactHits = notCancelled - impactHits;
+
+      // Then hits that overwhelm armor are counted.
+      final overwhelmed = math.max(0, nonImpactHits - simulation.armor);
+
+      // Combine both numbers. The rest are cancelled.
+      notCancelled = impactHits + overwhelmed;
+    }
     final success = notCancelled + crits;
     final defense = _holodeck.rollDefenses(
       simulation.defense,
@@ -70,6 +85,14 @@ class Simulation {
   /// How much static defenses are available.
   final int coverOrDodgeOrGuardian;
 
+  /// How much armor is available.
+  ///
+  /// **NOTE**: A value of at least `5` is considered unlimited.
+  final int armor;
+
+  /// How much impact is in the pool.
+  final int impact;
+
   /// Whether the defending unit has impervious to pierce.
   final bool impervious;
 
@@ -85,6 +108,8 @@ class Simulation {
     @required this.defense,
     @required this.defenseSurge,
     @required this.coverOrDodgeOrGuardian,
+    @required this.armor,
+    @required this.impact,
     @required this.impervious,
     @required this.reRollForCrits,
   });

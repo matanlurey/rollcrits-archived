@@ -21,6 +21,12 @@ $labelWidth: 70px;
   }
 }
 
+material-checkbox {
+  margin-left: 0;
+  margin-top: 0;
+  text-transform: uppercase;
+}
+
 h3 {
   display: inline-block;
   width: 50px;
@@ -30,12 +36,6 @@ h3 {
   padding: 8px;
 
   ::ng-deep material-radio {
-    margin-left: 0;
-    margin-top: 0;
-    text-transform: uppercase;
-  }
-
-  ::ng-deep material-checkbox {
     margin-left: 0;
     margin-top: 0;
     text-transform: uppercase;
