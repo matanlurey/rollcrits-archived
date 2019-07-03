@@ -45,6 +45,24 @@
     (ngModelChange)="setImpact($event)"
   ></material-input>
   <br />
+  <!-- TODO
+  <material-input
+    type="number"
+    label="Critical: X"
+    floatingLabel
+    [ngModel]="criticalX"
+    (ngModelChange)="setCriticalX($event)"
+  ></material-input>
+  &nbsp;&nbsp;
+  <material-input
+    type="number"
+    label="Surge Tokens"
+    floatingLabel
+    [ngModel]="surgeTokens"
+    (ngModelChange)="setSurgeTokens($event)"
+  ></material-input>
+  <br />
+  -->
   <material-input
     type="number"
     label="Aim Tokens"
@@ -135,6 +153,18 @@
 
   <br />
 
+  <!-- TODO: Enable once available
+  <material-input
+    type="number"
+    label="Surge Tokens"
+    floatingLabel
+    [ngModel]="defensiveSurgeTokens"
+    (ngModelChange)="setDefensiveSurgeTokens($event)"
+  ></material-input>
+
+  <br />
+  -->
+
   <material-dropdown-select
     [buttonText]="armorLabel"
     [options]="armorValues"
@@ -184,6 +214,10 @@
         <tr>
           <td>Suppression</td>
           <td>{{ formatResults(averageSuppression) }}</td>
+        </tr>
+        <tr>
+          <td>Hits Through</td>
+          <td>{{ formatResults(averageSaves) }}</td>
         </tr>
         <tr>
           <td>Blocks</td>

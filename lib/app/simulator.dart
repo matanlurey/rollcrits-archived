@@ -73,6 +73,12 @@ class Simulation {
   /// What the unit or weapon's surge should convert to.
   final AttackSurge attackSurge;
 
+  /// Tokens to convert surge to hit (or crit if [criticalX]).
+  final int attackSurgeTokens;
+
+  /// Convert X surge to crits for the attack pool.
+  final int criticalX;
+
   /// How much pierce may be in the pool.
   final int pierce;
 
@@ -84,6 +90,9 @@ class Simulation {
 
   /// How much static defenses are available.
   final int coverOrDodgeOrGuardian;
+
+  /// Tokens to convert surge to block.
+  final int defensiveSurgeTokens;
 
   /// How much armor is available.
   ///
@@ -104,10 +113,13 @@ class Simulation {
     @required this.precise,
     @required this.attack,
     @required this.attackSurge,
+    @required this.criticalX,
+    @required this.attackSurgeTokens,
     @required this.pierce,
     @required this.defense,
     @required this.defenseSurge,
     @required this.coverOrDodgeOrGuardian,
+    @required this.defensiveSurgeTokens,
     @required this.armor,
     @required this.impact,
     @required this.impervious,

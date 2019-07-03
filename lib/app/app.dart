@@ -101,6 +101,24 @@ class RCApp {
   }
 
   @visibleForTemplate
+  var criticalX = 0;
+
+  @visibleForTemplate
+  void setCriticalX(int amount) {
+    criticalX = amount;
+    calculateResults();
+  }
+
+  @visibleForTemplate
+  var surgeTokens = 0;
+
+  @visibleForTemplate
+  void setSurgeTokens(int amount) {
+    surgeTokens = amount;
+    calculateResults();
+  }
+
+  @visibleForTemplate
   void addAttackDice(AttackDice color) {
     attackDice = ([...attackDice, color]..sort()).reversed.toList();
     calculateResults();
@@ -176,6 +194,15 @@ class RCApp {
   }
 
   @visibleForTemplate
+  var defensiveSurgeTokens = 0;
+
+  @visibleForTemplate
+  void setDefensiveSurgeTokens(int amount) {
+    defensiveSurgeTokens = amount;
+    calculateResults();
+  }
+
+  @visibleForTemplate
   var armor = 0;
 
   @visibleForTemplate
@@ -246,6 +273,9 @@ class RCApp {
   num averageCrits;
 
   @visibleForTemplate
+  num averageSaves;
+
+  @visibleForTemplate
   num averageBlocks;
 
   @visibleForTemplate
@@ -259,8 +289,8 @@ class RCApp {
 
   @visibleForTemplate
   static final chartProps = BarChartProperties()
-    ..xAxis.title.text = 'Wounds'
-    ..yAxis.title.text = 'Results (of $_iterations)';
+    ..xAxis.title.text = 'Result'
+    ..yAxis.title.text = 'Distribution (out of $_iterations)';
 
   @visibleForTemplate
   static String formatResults(num result) {
@@ -280,27 +310,38 @@ class RCApp {
       precise: precise,
       attack: attackDice,
       attackSurge: _attackToSurge[attackSurge],
+      attackSurgeTokens: surgeTokens,
+      criticalX: criticalX,
       pierce: pierce,
       defense: defenseDice,
       defenseSurge: defenseSurge == DefenseDiceSide.block,
       coverOrDodgeOrGuardian: cover + dodge + guardian,
+      defensiveSurgeTokens: defensiveSurgeTokens,
       impervious: impervious,
       reRollForCrits: reRollForCrits,
     );
-    final distribution = List<int>.filled(attackDice.length + 1, 0);
+
+    final savesPerDice = List<int>.filled(attackDice.length + 1, 0);
+    final woundsPerDice = savesPerDice.toList();
 
     var sumHits = 0;
     var sumCrits = 0;
+    var sumSaves = 0;
     var sumBlocks = 0;
     var sumWounds = 0;
     var sumSuppression = 0;
 
     for (var i = 0; i < _iterations; i++) {
       final result = results[i] = _simulator.simulate(simulation);
-      distribution[result.wounds]++;
+      final savesRolled = result.defense.blanks + result.defense.blocks;
+      final woundsTaken = result.wounds;
+
+      savesPerDice[savesRolled]++;
+      woundsPerDice[woundsTaken]++;
 
       sumHits += result.hits;
       sumCrits += result.crits;
+      sumSaves += savesRolled;
       sumBlocks += result.blocks;
       sumWounds += result.wounds;
 
@@ -311,14 +352,16 @@ class RCApp {
 
     averageHits = sumHits / _iterations;
     averageCrits = sumCrits / _iterations;
+    averageSaves = sumSaves / _iterations;
     averageBlocks = sumBlocks / _iterations;
     averageWounds = sumWounds / _iterations;
     averageSuppression = sumSuppression / _iterations;
 
     final data = <BarChartColumnData>[];
-    for (var i = 0; i < distribution.length; i++) {
-      data.add(BarChartColumnData('$i', [distribution[i].toDouble()]));
+    for (var i = 0; i < savesPerDice.length; i++) {
+      data.add(BarChartColumnData(
+          '$i', [savesPerDice[i].toDouble(), woundsPerDice[i].toDouble()]));
     }
-    chartData = BarChartData(['Wounds'], data);
+    chartData = BarChartData(['Hits Through', 'Wounds'], data);
   }
 }
