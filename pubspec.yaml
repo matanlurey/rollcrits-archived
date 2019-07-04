@@ -1,10 +1,16 @@
 name: rollcrits
 
+environment:
+  sdk: ">=2.3.0 <3.0.0"
+
 dependencies:
   angular:
   angular_components:
   angular_modern_charts:
   swlegion:
+  swlegion_simulator:
+    path:
+      ../swlegion_simulator
 
 dev_dependencies:
   angular_test:

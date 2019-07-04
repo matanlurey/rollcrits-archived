@@ -45,7 +45,6 @@
     (ngModelChange)="setImpact($event)"
   ></material-input>
   <br />
-  <!-- TODO
   <material-input
     type="number"
     label="Critical: X"
@@ -62,7 +61,6 @@
     (ngModelChange)="setSurgeTokens($event)"
   ></material-input>
   <br />
-  -->
   <material-input
     type="number"
     label="Aim Tokens"
@@ -153,7 +151,6 @@
 
   <br />
 
-  <!-- TODO: Enable once available
   <material-input
     type="number"
     label="Surge Tokens"
@@ -163,7 +160,6 @@
   ></material-input>
 
   <br />
-  -->
 
   <material-dropdown-select
     [buttonText]="armorLabel"
@@ -187,6 +183,9 @@
   <div class="action-container">
     <material-button disabled class="action" style="text-align: center">
       Download .CSV
+    </material-button>
+    <material-button disabled class="action" style="text-align: center">
+      Generate Image
     </material-button>
   </div>
 </h2>

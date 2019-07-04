@@ -1,33 +1,36 @@
 import 'dart:math' as math;
 
 import 'package:meta/meta.dart';
-import 'package:swlegion/holodeck.dart';
 import 'package:swlegion/swlegion.dart';
+import 'package:swlegion_simulator/swlegion_simulator.dart' as swlegion;
 
 class Simulator {
-  final Holodeck _holodeck;
+  final swlegion.Simulator _simulator;
 
-  const Simulator(this._holodeck);
+  const Simulator(this._simulator);
 
   Results simulate(Simulation simulation) {
-    var attack = _holodeck.rollAttacks(
-      simulation.attack,
-      simulation.attackSurge,
+    var attack = _simulator.rollAttack(
+      dice: simulation.attack,
+      surgeTo: simulation.attackSurge,
+      surgeTokens: simulation.attackSurgeTokens,
+      criticalX: simulation.criticalX,
     );
     var aimTokens = simulation.aimTokens;
 
     while (aimTokens > 0) {
-      attack = _holodeck.rerollAttack(
+      attack = _simulator.rerollAttack(
         attack,
-        surge: simulation.attackSurge,
-        rerollForCrits: simulation.reRollForCrits ? attack.hits.length : 0,
-        maxDice: 2 + simulation.precise,
+        aimTokens: simulation.aimTokens,
+        preciseX: simulation.precise,
+        surgeTo: simulation.attackSurge,
+        preferCrits: simulation.reRollForCrits,
       );
       aimTokens--;
     }
 
-    final hits = attack.hits.length;
-    final crits = attack.crits.length;
+    final hits = attack.hitsRolled.length;
+    final crits = attack.critsRolled.length;
     var notCancelled = math.max(0, hits - simulation.coverOrDodgeOrGuardian);
     if (simulation.armor >= 5) {
       // Unlimited armor: Only impact hits are counted.
@@ -45,12 +48,15 @@ class Simulator {
       notCancelled = impactHits + overwhelmed;
     }
     final success = notCancelled + crits;
-    final defense = _holodeck.rollDefenses(
-      simulation.defense,
-      success + (simulation.impervious ? simulation.pierce : 0),
-      surge: simulation.defenseSurge,
+    final defense = _simulator.rollDefense(
+      dice: List.filled(
+        success + (simulation.impervious ? simulation.pierce : 0),
+        simulation.defense,
+      ),
+      hasDefenseSurge: simulation.defenseSurge,
+      surgeTokens: simulation.defensiveSurgeTokens,
     );
-    final blocks = defense.blocks;
+    final blocks = defense.blocksRolled.length;
     final wounds = success - math.max<int>(0, blocks - simulation.pierce);
     return Results(
       attack: attack,
@@ -128,8 +134,8 @@ class Simulation {
 }
 
 class Results {
-  final Attack attack;
-  final Defense defense;
+  final swlegion.AttackResult attack;
+  final swlegion.DefenseResult defense;
 
   /// Total number of wound results after.
   final int wounds;
@@ -141,11 +147,14 @@ class Results {
   });
 
   /// Total number of "hit" results.
-  int get hits => attack.hits.length;
+  int get hits => attack.hitsRolled.length;
 
   /// Total number of "crit" results.
-  int get crits => attack.crits.length;
+  int get crits => attack.critsRolled.length;
 
   /// Total number of "block" results.
-  int get blocks => defense.blocks;
+  int get blocks => defense.blocksRolled.length;
+
+  /// Total number of defensive dice rolled.
+  int get savesAttempted => defense.blocksRolled.length + defense.blanksRolled.length;
 }

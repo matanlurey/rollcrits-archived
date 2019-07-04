@@ -10,8 +10,8 @@ import 'package:angular_components/material_radio/material_radio_group.dart';
 import 'package:angular_components/material_select/material_dropdown_select.dart';
 import 'package:angular_modern_charts/angular_modern_charts.dart';
 import 'package:rollcrits/widgets.dart';
-import 'package:swlegion/holodeck.dart';
 import 'package:swlegion/swlegion.dart';
+import 'package:swlegion_simulator/swlegion_simulator.dart' as swlegion;
 
 import 'simulator.dart';
 
@@ -46,7 +46,7 @@ import 'simulator.dart';
   ],
 )
 class RCApp {
-  static final _simulator = Simulator(Holodeck());
+  static final _simulator = Simulator(swlegion.Simulator());
   static final _iterations = 20000;
 
   @visibleForTemplate
@@ -302,6 +302,12 @@ class RCApp {
 
   @visibleForTemplate
   void calculateResults() {
+    if (attackDice.isEmpty) {
+      averageHits = averageCrits = averageSaves = averageBlocks = averageSuppression = null;
+      chartData = null;
+      return;
+    }
+
     final results = List<Results>.filled(_iterations, null);
     final simulation = Simulation(
       aimTokens: aimTokens,
@@ -333,7 +339,7 @@ class RCApp {
 
     for (var i = 0; i < _iterations; i++) {
       final result = results[i] = _simulator.simulate(simulation);
-      final savesRolled = result.defense.blanks + result.defense.blocks;
+      final savesRolled = result.savesAttempted;
       final woundsTaken = result.wounds;
 
       savesPerDice[savesRolled]++;
