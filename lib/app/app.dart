@@ -10,8 +10,8 @@ import 'package:angular_components/material_radio/material_radio_group.dart';
 import 'package:angular_components/material_select/material_dropdown_select.dart';
 import 'package:angular_modern_charts/angular_modern_charts.dart';
 import 'package:rollcrits/widgets.dart';
-import 'package:swlegion/holodeck.dart';
 import 'package:swlegion/swlegion.dart';
+import 'package:swlegion_simulator/swlegion_simulator.dart' as swlegion;
 
 import 'simulator.dart';
 
@@ -46,7 +46,7 @@ import 'simulator.dart';
   ],
 )
 class RCApp {
-  static final _simulator = Simulator(Holodeck());
+  static final _simulator = Simulator(swlegion.Simulator());
   static final _iterations = 20000;
 
   @visibleForTemplate
@@ -97,6 +97,24 @@ class RCApp {
   @visibleForTemplate
   void setReRollForCrits(bool value) {
     reRollForCrits = value;
+    calculateResults();
+  }
+
+  @visibleForTemplate
+  var criticalX = 0;
+
+  @visibleForTemplate
+  void setCriticalX(int amount) {
+    criticalX = amount;
+    calculateResults();
+  }
+
+  @visibleForTemplate
+  var surgeTokens = 0;
+
+  @visibleForTemplate
+  void setSurgeTokens(int amount) {
+    surgeTokens = amount;
     calculateResults();
   }
 
@@ -176,6 +194,15 @@ class RCApp {
   }
 
   @visibleForTemplate
+  var defensiveSurgeTokens = 0;
+
+  @visibleForTemplate
+  void setDefensiveSurgeTokens(int amount) {
+    defensiveSurgeTokens = amount;
+    calculateResults();
+  }
+
+  @visibleForTemplate
   var armor = 0;
 
   @visibleForTemplate
@@ -246,6 +273,9 @@ class RCApp {
   num averageCrits;
 
   @visibleForTemplate
+  num averageSaves;
+
+  @visibleForTemplate
   num averageBlocks;
 
   @visibleForTemplate
@@ -259,8 +289,8 @@ class RCApp {
 
   @visibleForTemplate
   static final chartProps = BarChartProperties()
-    ..xAxis.title.text = 'Wounds'
-    ..yAxis.title.text = 'Results (of $_iterations)';
+    ..xAxis.title.text = 'Result'
+    ..yAxis.title.text = 'Distribution (out of $_iterations)';
 
   @visibleForTemplate
   static String formatResults(num result) {
@@ -272,6 +302,12 @@ class RCApp {
 
   @visibleForTemplate
   void calculateResults() {
+    if (attackDice.isEmpty) {
+      averageHits = averageCrits = averageSaves = averageBlocks = averageSuppression = null;
+      chartData = null;
+      return;
+    }
+
     final results = List<Results>.filled(_iterations, null);
     final simulation = Simulation(
       aimTokens: aimTokens,
@@ -280,27 +316,38 @@ class RCApp {
       precise: precise,
       attack: attackDice,
       attackSurge: _attackToSurge[attackSurge],
+      attackSurgeTokens: surgeTokens,
+      criticalX: criticalX,
       pierce: pierce,
       defense: defenseDice,
       defenseSurge: defenseSurge == DefenseDiceSide.block,
       coverOrDodgeOrGuardian: cover + dodge + guardian,
+      defensiveSurgeTokens: defensiveSurgeTokens,
       impervious: impervious,
       reRollForCrits: reRollForCrits,
     );
-    final distribution = List<int>.filled(attackDice.length + 1, 0);
+
+    final savesPerDice = List<int>.filled(attackDice.length + 1, 0);
+    final woundsPerDice = savesPerDice.toList();
 
     var sumHits = 0;
     var sumCrits = 0;
+    var sumSaves = 0;
     var sumBlocks = 0;
     var sumWounds = 0;
     var sumSuppression = 0;
 
     for (var i = 0; i < _iterations; i++) {
       final result = results[i] = _simulator.simulate(simulation);
-      distribution[result.wounds]++;
+      final savesRolled = result.savesAttempted;
+      final woundsTaken = result.wounds;
+
+      savesPerDice[savesRolled]++;
+      woundsPerDice[woundsTaken]++;
 
       sumHits += result.hits;
       sumCrits += result.crits;
+      sumSaves += savesRolled;
       sumBlocks += result.blocks;
       sumWounds += result.wounds;
 
@@ -311,14 +358,16 @@ class RCApp {
 
     averageHits = sumHits / _iterations;
     averageCrits = sumCrits / _iterations;
+    averageSaves = sumSaves / _iterations;
     averageBlocks = sumBlocks / _iterations;
     averageWounds = sumWounds / _iterations;
     averageSuppression = sumSuppression / _iterations;
 
     final data = <BarChartColumnData>[];
-    for (var i = 0; i < distribution.length; i++) {
-      data.add(BarChartColumnData('$i', [distribution[i].toDouble()]));
+    for (var i = 0; i < savesPerDice.length; i++) {
+      data.add(BarChartColumnData(
+          '$i', [savesPerDice[i].toDouble(), woundsPerDice[i].toDouble()]));
     }
-    chartData = BarChartData(['Wounds'], data);
+    chartData = BarChartData(['Hits Through', 'Wounds'], data);
   }
 }
